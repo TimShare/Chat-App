@@ -1,0 +1,20 @@
+.add-member {
+    background-color: #007bff; /* Синий цвет фона */
+    color: white; /* Белый цвет текста */
+    border: none; /* Без рамки */
+    border-radius: 5px; /* Скругление углов */
+    padding: 10px 15px; /* Отступы внутри кнопки */
+    font-size: 14px; /* Размер шрифта */
+    cursor: pointer; /* Курсор при наведении */
+    transition: background-color 0.3s ease, transform 0.1s ease; /* Плавный переход */
+  }
+  
+  .add-member:hover {
+    background-color: #0056b3; /* Темнее синий при наведении */
+  }
+  
+  .add-member:active {
+    background-color: #004085; /* Еще темнее при нажатии */
+    transform: scale(0.98); /* Уменьшение размера кнопки при нажатии */
+  }
+  

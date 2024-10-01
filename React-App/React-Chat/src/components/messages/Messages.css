@@ -1,0 +1,46 @@
+.messages {
+    padding: 10px;
+    background-color: #f9f9f9; /* Цвет фона для области сообщений */
+    border-radius: 5px; /* Закругленные углы */
+
+    overflow-y: auto; /* Прокрутка, если сообщений много */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Легкая тень */
+  }
+  
+  .messages-list {
+    list-style-type: none; /* Убираем маркеры списка */
+    padding: 0; /* Убираем отступы */
+    margin: 0; /* Убираем внешние отступы */
+  }
+  
+  .message-item {
+    border: 1px solid #181818; /* Рамка вокруг сообщения */
+    padding: 10px; /* Внутренний отступ со всех сторон */
+    padding-left: 20px; /* Отдельный отступ слева для содержимого */
+    margin-bottom: 10px; /* Отступ между сообщениями */
+    border-radius: 5px; /* Закругление углов рамки */
+    background-color: #3b455a; /* Цвет фона сообщения */
+    display: flex; /* Использование flexbox для выравнивания */
+    align-items: center; /* Выравнивание по центру по вертикали */
+  }
+  .message-item:hover {
+    background-color: #414d66; /* Цвет фона при наведении */
+  }
+  
+  .message-author {
+    font-weight: bold; /* Полужирный текст для имени автора */
+    margin-right: 5px; /* Отступ между автором и содержимым */
+  }
+  
+  .message-content {
+    flex: 1; /* Заполнение оставшегося пространства */
+    margin-right: 10px; /* Отступ между содержимым и временем */
+  }
+
+  .message-time {
+    color: #555; /* Цвет текста для времени */
+    font-size: 0.85em; /* Уменьшенный размер шрифта для времени */
+  }
+  .messages::-webkit-scrollbar {
+    display: none; /* Для Chrome, Safari и других WebKit браузеров */
+  }
