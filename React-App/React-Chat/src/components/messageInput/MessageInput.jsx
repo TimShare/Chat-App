@@ -1,12 +1,15 @@
 import { useState } from "react";
 import { sendMessage } from "../../helpers/websocketService";
-
-const MessageInput = ({ chat, userdata }) => {
+import "./MessageInput.css";
+const MessageInput = ({ chat, userdata, accessLevels }) => {
   const [message, setMessage] = useState("");
+
+  // Проверка прав доступа на отправку сообщений
+  const canSendMessage = accessLevels[userdata.username] === "read_and_write";
 
   // Функция для отправки сообщения через WebSocket
   const handleSendMessage = () => {
-    if (message.trim() !== "" && chat && chat.id) {
+    if (message.trim() !== "" && chat && chat.id && canSendMessage) {
       const messageData = {
         chat_id: chat.id, // ID выбранного чата
         content: message, // Текст сообщения
@@ -36,10 +39,11 @@ const MessageInput = ({ chat, userdata }) => {
         value={message}
         onChange={(e) => setMessage(e.target.value)}
         onKeyDown={handleKeyPress} // Отправляем сообщение при нажатии Enter
+        disabled={!canSendMessage} // Отключаем поле ввода, если нет прав
       />
       <button
         onClick={handleSendMessage}
-        disabled={message.trim() === ""} // Отключаем кнопку, если поле пустое
+        disabled={!canSendMessage || message.trim() === ""} // Отключаем кнопку, если нет прав или поле пустое
       >
         ➤
       </button>

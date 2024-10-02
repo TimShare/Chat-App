@@ -21,3 +21,7 @@ async def add_user_to_chat_endpoint(chat_id: int, user_id: int, db: Session = De
 @router.post("/private-chat/")
 async def create_private_chat(to_user_id: int, current_user: int, db: Session = Depends(get_db)):
     return crud.create_private_chat(db=db, to_user_id=to_user_id, current_user=current_user)
+
+@router.get("/users/")
+def users_in_chat(chat_id: int, db: Session = Depends(get_db)):
+    return crud.get_users_in_chat(chat_id=chat_id, db=db)

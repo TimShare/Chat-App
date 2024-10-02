@@ -126,11 +126,21 @@ def add_user_to_chat(db: Session, chat_id: int, user_id: int):
     if user_in_chat:
         raise HTTPException(status_code=400, detail="User already in chat")
 
+
+
     # Добавляем пользователя в чат через таблицу связи
     stmt = models.chat_user_association.insert().values(chat_id=chat_id, user_id=user_id)
     db.execute(stmt)
     db.commit()
     return {"message": "User successfully added to chat"}
+
+
+def get_users_in_chat(db: Session, chat_id: int):
+    users_in_chat = db.query(models.chat_user_association.c.user_id).filter(
+        models.chat_user_association.c.chat_id == chat_id
+    ).all()
+
+    return [user.user_id for user in users_in_chat]
 
 
 def get_messages_in_chat(db: Session, chat_id: int):
@@ -141,7 +151,6 @@ def get_messages_in_chat(db: Session, chat_id: int):
         .filter(models.Message.chat_id == chat_id)
         .all()
     )
-
 
     result = []
     for message, username in messages:
@@ -180,3 +189,49 @@ def set_user_offline(db: Session, user_id: int):
 
 def from_id_to_username(db: Session, user_id: int):
     return db.query(models.User).filter(models.User.id == user_id).first().username
+
+
+# def create_user(db: Session, user: schemas.UserCreate):
+#     created_date = datetime.now()
+#     password = user.password
+#     db_user = models.User(email=user.email, password=password, username=user.username, created_at=created_date)
+#     db.add(db_user)
+#     db.commit()
+#     db.refresh(db_user)
+#     return db_user
+
+def create_chat_permissions(db: Session, chat_permission: schemas.ChatPermissionsBase):
+    permissions_in_chat = db.query(models.chat_user_association).filter(
+        models.ChatPermissions.chat_id == chat_permission.chat_id,
+        models.ChatPermissions.user_id == chat_permission.user_id
+    ).first()
+
+    if permissions_in_chat:
+        raise HTTPException(status_code=400, detail="permissions_in_chat already exist")
+    db_chat_permission = models.ChatPermissions(**chat_permission.dict())
+    db.add(db_chat_permission)
+    db.commit()
+    db.refresh(db_chat_permission)
+    return db_chat_permission
+
+
+def change_chat_permissions(db: Session, chat_permission: schemas.ChatPermissionsBase):
+    permissions_in_chat = db.query(models.ChatPermissions).filter(
+        models.ChatPermissions.chat_id == chat_permission.chat_id,
+        models.ChatPermissions.user_id == chat_permission.user_id
+    ).first()
+    if not permissions_in_chat:
+        create_chat_permissions(db, chat_permission)
+    permissions_in_chat.role = chat_permission.role
+    db.commit()
+    db.refresh(permissions_in_chat)
+
+    return permissions_in_chat
+
+def get_chat_permissions(db: Session, chat_id: int, user_id:int):
+    permissions_in_chat = db.query(models.ChatPermissions).filter(
+        models.ChatPermissions.chat_id == chat_id,
+        models.ChatPermissions.user_id == user_id
+    ).first()
+
+    return permissions_in_chat

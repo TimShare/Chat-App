@@ -55,3 +55,14 @@ class Message(MessageBase):
     username: Optional[str] = None
     class Config:
         orm_mode = True
+
+class ChatPermissionsBase(BaseModel):
+    chat_id: int
+    user_id: int
+    role: str
+
+
+class ChatPermission(ChatPermissionsBase):
+    id: int
+    class Config:
+        orm_mode = True

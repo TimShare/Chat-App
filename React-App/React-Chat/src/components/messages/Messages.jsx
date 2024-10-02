@@ -32,7 +32,6 @@ const Messages = ({ chat }) => {
       if (newMessage.chat_id === chat.id) {
         setMessages((prevMessages) => [...prevMessages, newMessage]);
       }
-      console.log(messages);
     };
 
     addMessageHandler(handleNewMessage); // Добавляем обработчик сообщений WebSocket

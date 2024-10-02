@@ -1,0 +1,51 @@
+.message-input {
+    display: flex;
+    padding: 20px;
+    background-color: #2B3342;
+    border-top: 1px solid #3A4251;
+}
+
+.message-input input {
+    flex: 1;
+    padding: 10px;
+    border: none;
+    border-radius: 20px;
+    background-color: #1E2532;
+    color: white;
+    margin-right: 10px;
+    transition: background-color 0.3s ease; /* Плавный переход цвета фона */
+}
+
+/* Стили для заблокированного поля ввода */
+.message-input input:disabled {
+    background-color: #f0f0f0; /* Светло-серый фон для заблокированного input */
+    color: #b0b0b0; /* Цвет текста для заблокированного input */
+    cursor: not-allowed; /* Курсор "запрещено" */
+    border: 1px solid #d0d0d0; /* Светло-серый бордер */
+    opacity: 0.6; /* Уменьшенная непрозрачность */
+}
+
+/* Стили для кнопки */
+.message-input button {
+    background-color: #4A90E2; /* Цвет фона кнопки */
+    border: none;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: background-color 0.2s ease; /* Плавный переход цвета фона */
+}
+
+/* Стили для заблокированной кнопки */
+.message-input button:disabled {
+    background-color: #d0d0d0; /* Светло-серый фон для заблокированной кнопки */
+    color: #b0b0b0; /* Цвет текста для заблокированной кнопки */
+    cursor: not-allowed; /* Курсор "запрещено" */
+    opacity: 0.6; /* Уменьшенная непрозрачность */
+    pointer-events: none; /* Запрет на взаимодействие с элементом */
+}
+
+/* Эффект наведения на кнопку */
+.message-input button:hover:not(:disabled) {
+    background-color: #0056b3; /* Темнее при наведении */
+}

@@ -17,4 +17,10 @@
     background-color: #004085; /* Еще темнее при нажатии */
     transform: scale(0.98); /* Уменьшение размера кнопки при нажатии */
   }
-  
+
+.chat-username {
+  font-weight: bold;
+}
+.chat-username:hover{
+  cursor: pointer
+}

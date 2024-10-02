@@ -29,7 +29,6 @@ const Sidebar = ({ userdata, setSelectedChat }) => {
       fetchUserChats();
 
       const handleNewMessage = (message) => {
-        console.log("Новое сообщение:", message);
         fetchUserChats();
       };
 

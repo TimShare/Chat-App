@@ -1,0 +1,99 @@
+.chat-info-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5); /* Полупрозрачный фон */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.chat-info-content {
+    background-color: #2B3342; /* Цвет фона модального окна */
+    color: white;
+    padding: 20px;
+    border-radius: 10px;
+    width: 400px; /* Ширина окна */
+    max-height: 80%; /* Ограничение высоты */
+    overflow-y: auto; /* Прокрутка, если контент превышает высоту */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5); /* Тень для модального окна */
+}
+
+.chat-info-content h2 {
+    font-size: 24px;
+    margin-bottom: 15px;
+}
+
+.chat-info-content h3 {
+    font-size: 18px;
+    margin-top: 20px;
+}
+
+.chat-info-content ul {
+    list-style: none;
+    padding: 0;
+    margin: 0; /* Убираем отступы */
+}
+
+.chat-info-content li {
+    padding: 10px 0;
+    border-bottom: 1px solid #3A4251;
+    display: flex; /* Используем flex для выравнивания */
+    justify-content: space-between; /* Размещаем пользователей и их права доступа */
+    align-items: center; /* Центрируем вертикально */
+}
+
+.chat-info-content p {
+    font-size: 14px;
+    color: #AAAAAA;
+    margin-bottom: 20px;
+}
+
+.chat-info-content button {
+    background-color: #4A90E2;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 20px;
+    color: white;
+    cursor: pointer;
+    margin-top: 20px;
+    width: 100%;
+    font-size: 16px; /* Увеличиваем размер шрифта для кнопки */
+    transition: background-color 0.3s ease; /* Плавный переход при наведении */
+}
+
+.chat-info-content button:hover {
+    background-color: #357ABD; /* Темнее при наведении */
+}
+
+.chat-info-content select {
+    background-color: #1E2532; /* Цвет фона выпадающего меню */
+    color: white;
+    border: none;
+    border-radius: 5px; /* Закругление углов */
+    padding: 5px; /* Внутренний отступ */
+    margin-left: 10px; /* Отступ от имени пользователя */
+    cursor: pointer; /* Указатель при наведении */
+}
+
+/* Стили для прокрутки в Firefox */
+.chat-info-content {
+    scrollbar-width: thin; /* Тонкая полоса прокрутки */
+    scrollbar-color: #4A90E2 #2B3342; /* Цвет полосы прокрутки и фона */
+}
+
+/* Стили для прокрутки в Chrome, Safari и других WebKit браузерах */
+.chat-info-content::-webkit-scrollbar {
+    width: 8px; /* Ширина полосы прокрутки */
+}
+
+.chat-info-content::-webkit-scrollbar-thumb {
+    background-color: #4A90E2; /* Цвет полосы прокрутки */
+    border-radius: 10px; /* Закругление углов полосы прокрутки */
+}
+
+.chat-info-content::-webkit-scrollbar-track {
+    background-color: #2B3342; /* Цвет фона полосы прокрутки */
+}

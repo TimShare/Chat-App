@@ -2,8 +2,8 @@ import React, { useState, memo } from "react";
 import axios from "axios";
 import "./AddMemberModal.css"; // Убедитесь, что файл стилей подключен
 import { sendMessage } from "../../helpers/websocketService";
-import From_id_to_username from "../../helpers/from_id_to_username";
-const AddMemberModal = memo(({ isOpen, onClose, chat, onMemberAdded }) => {
+import { getUsernameById } from "../../helpers/getUsernameById";
+const AddMemberModal = memo(({ isOpen, onClose, chat }) => {
   if (!isOpen) return null;
   const [userId, setUserId] = useState("");
   const handleAddMember = async () => {
@@ -14,15 +14,16 @@ const AddMemberModal = memo(({ isOpen, onClose, chat, onMemberAdded }) => {
         { params: { chat_id: chat.id, user_id: userId } }
       );
       console.log("Участник добавлен:", response.data);
+      const username = await getUsernameById(userId); // Дожидаемся результата
+
       const messageData = {
         chat_id: chat.id,
-        content: ` пригласил ${userId}`,
+        content: `пригласил ${username}`, // Используем имя пользователя
         sender_id: chat.owner_id,
       };
 
       // Отправляем сообщение через сервис WebSocket
-      sendMessage(messageData);
-      onMemberAdded(); // Обновляем список участников или чата
+      await sendMessage(messageData);
       onClose(); // Закрываем модальное окно
       setUserId(""); // Очищаем поле ввода
     } catch (error) {
