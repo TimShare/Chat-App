@@ -9,18 +9,13 @@ import {
 import "./ChatApp.css";
 
 const ChatApp = ({ userdata, setUserdata }) => {
-  const [isConnected, setIsConnected] = useState(false);
   const [selectedChat, setSelectedChat] = useState(null);
 
   useEffect(() => {
     if (userdata) {
-      const handleWebSocketOpen = () => {
-        setIsConnected(true);
-      };
+      const handleWebSocketOpen = () => {};
 
-      const handleWebSocketClose = () => {
-        setIsConnected(false);
-      };
+      const handleWebSocketClose = () => {};
 
       connectWebSocket(userdata.id, handleWebSocketOpen, handleWebSocketClose);
 
@@ -37,7 +32,11 @@ const ChatApp = ({ userdata, setUserdata }) => {
         setUserdata={setUserdata}
         setSelectedChat={setSelectedChat}
       />
-      <ChatWindow chat={selectedChat} userdata={userdata} />
+      <ChatWindow
+        chat={selectedChat}
+        userdata={userdata}
+        setSelectedChat={setSelectedChat}
+      />
     </div>
   );
 };

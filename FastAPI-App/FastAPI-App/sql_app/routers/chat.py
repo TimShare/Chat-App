@@ -25,3 +25,7 @@ async def create_private_chat(to_user_id: int, current_user: int, db: Session = 
 @router.get("/users/")
 def users_in_chat(chat_id: int, db: Session = Depends(get_db)):
     return crud.get_users_in_chat(chat_id=chat_id, db=db)
+
+@router.delete("/{chat_id}", response_model=dict)
+def delete_chat(chat_id: int, user_id:int,  db: Session = Depends(get_db)):
+    return crud.delete_chat(db=db, chat_id=chat_id, user_id=user_id)

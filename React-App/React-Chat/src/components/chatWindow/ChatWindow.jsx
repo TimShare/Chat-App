@@ -8,12 +8,39 @@ import Messages from "../messages/Messages";
 import ChatInfoModal from "../сhatInfoModal/ChatInfoModal";
 import { getUsernameById } from "../../helpers/getUsernameById";
 import { sendMessage } from "../../helpers/websocketService";
-const ChatWindow = ({ chat, userdata, ws }) => {
+const ChatWindow = ({ chat, userdata, ws, setSelectedChat }) => {
   const [isAddMemberModalOpen, setIsAddMemberModalOpen] = useState(false);
   const [isChatInfoModalOpen, setIsChatInfoModalOpen] = useState(false);
   const [userIds, setUserIds] = useState([]);
   const [usernames, setUsernames] = useState([]);
   const [accessLevels, setAccessLevels] = useState({}); // Состояние для хранения прав доступа
+
+  const handleDeleteChat = async (chatId) => {
+    const confirmed = window.confirm(
+      "Вы уверены, что хотите удалить этот чат?"
+    );
+    if (confirmed) {
+      try {
+        const response = await fetch(
+          `http://localhost:8000/chats/${chatId}?user_id=${userdata.id}`,
+          {
+            method: "DELETE",
+          }
+        );
+        if (response.ok) {
+          alert("Чат успешно удален!");
+          // sendMessage(`Chat ${chatId} deleted`);
+          setIsChatInfoModalOpen(false); // Закрыть модальное окно после удаления
+          setSelectedChat(null);
+          // Можно добавить логику для обновления списка чатов
+        } else {
+          alert("Ошибка при удалении чата");
+        }
+      } catch (error) {
+        console.error("Ошибка:", error);
+      }
+    }
+  };
 
   useEffect(() => {
     const fetchChatMembers = async () => {
@@ -133,7 +160,8 @@ const ChatWindow = ({ chat, userdata, ws }) => {
         userdata={userdata}
         usernames={usernames} // Передаем usernames
         accessLevels={accessLevels} // Передаем accessLevels
-        handleAccessChange={handleAccessChange} // Передаем функцию изменения доступа
+        handleAccessChange={handleAccessChange}
+        handleDeleteChat={handleDeleteChat} // Передаем функцию изменения доступа
       />
     </main>
   );

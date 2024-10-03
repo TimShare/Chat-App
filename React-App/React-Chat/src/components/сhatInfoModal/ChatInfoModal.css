@@ -51,7 +51,7 @@
     margin-bottom: 20px;
 }
 
-.chat-info-content button {
+.chat-info-content-button {
     background-color: #4A90E2;
     border: none;
     padding: 10px 20px;
@@ -64,7 +64,7 @@
     transition: background-color 0.3s ease; /* Плавный переход при наведении */
 }
 
-.chat-info-content button:hover {
+.chat-info-content-button:hover {
     background-color: #357ABD; /* Темнее при наведении */
 }
 
@@ -96,4 +96,24 @@
 
 .chat-info-content::-webkit-scrollbar-track {
     background-color: #2B3342; /* Цвет фона полосы прокрутки */
+}
+
+.chat-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+.delete-chat-btn {
+    background-color: #ff4d4d;
+    color: white;
+    border: none;
+    padding: 4px 10px; /* Уменьшаем отступы */
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px; /* Уменьшаем размер шрифта */
+    height: 30px; /* Фиксированная высота для уменьшения кнопки */
+    line-height: 1; /* Убираем лишнее пространство внутри кнопки */
+}
+.delete-chat-btn:hover {
+    background-color: #ff1a1a;
 }

@@ -73,6 +73,13 @@ def create_chat(db: Session, chat: schemas.ChatCreate):
     )
     db.execute(stmt)
     db.commit()
+    chat_permission = schemas.ChatPermissionsBase(
+        chat_id=db_chat.id,  # ID только что созданного чата
+        user_id=chat.owner_id,    # ID владельца
+        role="read_and_write"
+    )
+    create_chat_permissions(db, chat_permission)
+
     return db_chat
 
 
@@ -87,6 +94,7 @@ def create_message(db: Session, message: schemas.MessageCreate, chat_id: int, se
     db.add(db_message)
     db.commit()
     db.refresh(db_message)
+
     return db_message
 
 
@@ -132,6 +140,12 @@ def add_user_to_chat(db: Session, chat_id: int, user_id: int):
     stmt = models.chat_user_association.insert().values(chat_id=chat_id, user_id=user_id)
     db.execute(stmt)
     db.commit()
+    chat_permission = schemas.ChatPermissionsBase(
+        chat_id=chat_id,  # ID только что созданного чата
+        user_id=user_id,  # ID владельца
+        role="read"
+    )
+    create_chat_permissions(db, chat_permission)
     return {"message": "User successfully added to chat"}
 
 
@@ -235,3 +249,33 @@ def get_chat_permissions(db: Session, chat_id: int, user_id:int):
     ).first()
 
     return permissions_in_chat
+
+
+def delete_chat(db: Session, chat_id: int, user_id: int):
+    # Шаг 1: Получаем чат по его ID
+    chat = db.query(models.Chat).filter(models.Chat.id == chat_id).first()
+
+    # Шаг 2: Проверяем, существует ли чат
+    if not chat:
+        raise HTTPException(status_code=404, detail="Chat not found")
+
+    # Шаг 3: Проверяем, что текущий пользователь является владельцем чата
+    if chat.owner_id != user_id:
+        raise HTTPException(status_code=403, detail="Only the owner can delete this chat")
+
+    # Шаг 4: Удаляем сообщения, связанные с чатом
+    db.query(models.Message).filter(models.Message.chat_id == chat_id).delete()
+
+    # Шаг 5: Удаляем права доступа, связанные с чатом
+    db.query(models.ChatPermissions).filter(models.ChatPermissions.chat_id == chat_id).delete()
+
+    # Шаг 6: Удаляем записи в таблице ассоциаций (chat_user_association)
+    db.execute(models.chat_user_association.delete().where(models.chat_user_association.c.chat_id == chat_id))
+
+    # Шаг 7: Удаляем сам чат
+    db.delete(chat)
+
+    # Сохранение изменений
+    db.commit()
+
+    return {"detail": "Chat and related data successfully deleted"}

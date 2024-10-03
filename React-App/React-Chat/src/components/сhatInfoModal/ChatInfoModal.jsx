@@ -10,6 +10,7 @@ const ChatInfoModal = ({
   usernames,
   accessLevels,
   handleAccessChange,
+  handleDeleteChat, // Функция для удаления чата
 }) => {
   if (!isOpen) {
     return null;
@@ -20,7 +21,17 @@ const ChatInfoModal = ({
   return (
     <div className="chat-info-modal">
       <div className="chat-info-content">
-        <h2>{chat.title}</h2>
+        <div className="chat-header">
+          <h2>{chat.title}</h2>
+          {isOwner && ( // Кнопка для удаления чата доступна только владельцу
+            <button
+              className="delete-chat-btn"
+              onClick={() => handleDeleteChat(chat.id)} // Вызываем функцию удаления чата
+            >
+              Удалить чат
+            </button>
+          )}
+        </div>
         <p>Дата основания: {FormatDate(chat.created_at)}</p>
         <h3>Участники:</h3>
         <ul>
@@ -39,7 +50,9 @@ const ChatInfoModal = ({
             </li>
           ))}
         </ul>
-        <button onClick={onClose}>Закрыть</button>
+        <button className={"chat-info-content-button"} onClick={onClose}>
+          Закрыть
+        </button>
       </div>
     </div>
   );
