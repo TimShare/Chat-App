@@ -23,6 +23,7 @@ def login(login_data: schemas.Login, db: Session = Depends(get_db)):
 
 @router.get("/{user_id}/chats", response_model=List[schemas.Chat])
 def read_user_chats(user_id: int, db: Session = Depends(get_db)):
+    print(user_id)
     chats = crud.get_user_chats(db, user_id)
     return chats
 

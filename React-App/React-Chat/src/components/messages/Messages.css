@@ -35,6 +35,10 @@
   .message-content {
     flex: 1; /* Заполнение оставшегося пространства */
     margin-right: 10px; /* Отступ между содержимым и временем */
+    max-width: 100%; /* Ограничение ширины элемента */
+  word-wrap: break-word; /* Перенос слов по границам */
+  word-break: break-word; /* Разрыв слов, если они слишком длинные */
+  white-space: pre-wrap; /* Учет переносов строк */
   }
 
   .message-time {
@@ -104,4 +108,10 @@
 
 .edit-message button:hover {
   background-color: #3B7EA1; /* Цвет кнопки при наведении */
+}
+.message-edited {
+  color: #8b8b8b; /* Цвет текста (золотистый) для метки "изм." */
+  font-size: 0.8em; /* Немного уменьшенный размер шрифта */
+  font-style: italic; /* Курсив для выделения */
+  margin-right: 10px;
 }

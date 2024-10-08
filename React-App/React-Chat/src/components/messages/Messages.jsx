@@ -1,15 +1,19 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import axios from "axios";
 import {
   addMessageHandler,
   removeMessageHandler,
-  connectWebSocket,
 } from "../../helpers/websocketService";
 import FormatDate from "../../helpers/FormatDate";
 import "./Messages.css";
 
-const Messages = ({ chat }) => {
+const Messages = ({ chat, onEditMessage }) => {
   const [messages, setMessages] = useState([]);
+  const bottomRef = useRef(null); // Реф для прокрутки вниз
+
+  const handleEdit = (message) => {
+    onEditMessage(message); // Вызываем функцию редактирования
+  };
 
   useEffect(() => {
     const fetchMessages = async () => {
@@ -29,26 +33,56 @@ const Messages = ({ chat }) => {
 
   useEffect(() => {
     const handleNewMessage = (newMessage) => {
+      console.log(newMessage);
       if (newMessage.chat_id === chat.id) {
-        setMessages((prevMessages) => [...prevMessages, newMessage]);
+        if (newMessage.action_type === "send_message") {
+          setMessages((prevMessages) => [...prevMessages, newMessage]);
+        }
+        if (newMessage.action_type === "message_edited") {
+          console.log("edit message");
+          setMessages((prevMessages) =>
+            prevMessages.map(
+              (message) =>
+                message.id === newMessage.id
+                  ? {
+                      ...message,
+                      content: newMessage.content,
+                      is_edited: newMessage.is_edited,
+                    } // Обновляем content и is_edited
+                  : message // Возвращаем оригинальное сообщение, если id не совпадает
+            )
+          );
+        }
       }
     };
 
-    addMessageHandler(handleNewMessage); // Добавляем обработчик сообщений WebSocket
+    addMessageHandler(handleNewMessage);
 
     return () => {
-      removeMessageHandler(handleNewMessage); // Убираем обработчик при размонтировании компонента
+      removeMessageHandler(handleNewMessage);
     };
   }, [chat.id]);
+
+  useEffect(() => {
+    // Прокрутка к нижнему элементу при добавлении нового сообщения
+    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
 
   return (
     <div className="messages">
       <ul className="messages-list">
         {messages.length > 0 ? (
-          messages.map((message, index) => (
-            <li key={index} className="message-item">
+          messages.map((message) => (
+            <li
+              key={message.id}
+              className="message-item"
+              onClick={() => handleEdit(message)}
+            >
               <span className="message-author">{message.username}</span>
               <span className="message-content">{message.content}</span>
+              <span className="message-edited">
+                {message.is_edited ? "изм." : ""}
+              </span>
               <span className="message-time">
                 {FormatDate(message.created_at)}
               </span>
@@ -57,6 +91,7 @@ const Messages = ({ chat }) => {
         ) : (
           <p>Нет сообщений в этом чате.</p>
         )}
+        <div ref={bottomRef} /> {/* Элемент для прокрутки */}
       </ul>
     </div>
   );

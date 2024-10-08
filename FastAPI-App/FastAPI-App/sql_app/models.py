@@ -1,5 +1,3 @@
-from symtable import Class
-
 from sqlalchemy import Boolean, Column, ForeignKey, Integer, String, DateTime, Table
 from sqlalchemy.orm import relationship
 from datetime import datetime

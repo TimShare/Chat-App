@@ -2,8 +2,6 @@ from pydantic import BaseModel, EmailStr
 from typing import Optional, List
 from datetime import datetime
 
-from sqlalchemy import false
-
 
 class Login(BaseModel):
     login: str | None
@@ -45,6 +43,9 @@ class MessageBase(BaseModel):
 class MessageCreate(MessageBase):
     pass
 
+class MessageEdit(MessageBase):
+    id: int
+
 class Message(MessageBase):
     id: int
     chat_id: int
@@ -55,6 +56,7 @@ class Message(MessageBase):
     username: Optional[str] = None
     class Config:
         orm_mode = True
+        from_attributes = True
 
 class ChatPermissionsBase(BaseModel):
     chat_id: int
