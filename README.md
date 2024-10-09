@@ -2,8 +2,7 @@ Chat-App
 ```markdown
 # API Documentation
 ## Эндпоинты
-
-### 1. Получить пользователя по ID
+### 1.Получить пользователя по ID
 - **URL**: `/users/{user_id}`
 - **Метод**: `GET`
 - **Заголовки**:
@@ -23,7 +22,6 @@ Chat-App
   {
     "detail": "User not found"
   }
-  ```
 
 ### 2. Получить пользователя по email
 - **URL**: `/users/email/{email}`
