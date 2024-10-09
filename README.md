@@ -1,16 +1,6 @@
 Chat-App
 ```markdown
 # API Documentation
-
-## Общая информация
-- **Базовый URL**: `/api/v1`
-- **Заголовки**:
-  - `Content-Type: application/json`
-  - `Authorization: Bearer <token>` (для авторизованных запросов)
-- **Формат авторизации**: Токен на основе JWT, передаваемый в заголовке `Authorization`.
-
----
-
 ## Эндпоинты
 
 ### 1. Получить пользователя по ID
