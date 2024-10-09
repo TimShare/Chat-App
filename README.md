@@ -1,7 +1,5 @@
 Chat-App
-```markdown
-# API Documentation
-## Эндпоинты
+
 ### 1.Получить пользователя по ID
 - **URL**: `/users/{user_id}`
 - **Метод**: `GET`
