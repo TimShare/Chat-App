@@ -9,10 +9,6 @@ router = APIRouter()
 @router.post("/edit-message", response_model=schemas.Message)
 async def edit_message(message_edit: schemas.MessageEdit, db: Session = Depends(get_db)):
     edited_message = crud.edit_message(db, message_edit)
-
-    if edited_message is None:
-        raise HTTPException(status_code=404, detail="Message not found")
-
     return schemas.Message.from_orm(edited_message)
 
 @router.post("/", response_model=schemas.Message)

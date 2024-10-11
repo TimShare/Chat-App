@@ -7,14 +7,23 @@ from . import models, schemas
 
 
 def get_user(db: Session, user_id: int):
-    return db.query(models.User).filter(models.User.id == user_id).first()
+    user = db.query(models.User).filter(models.User.id == user_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    return user
 
 
 def get_user_by_email(db: Session, email: str):
-    return db.query(models.User).filter(models.User.email == email).first()
+    user = db.query(models.User).filter(models.User.email == email).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User with this email not found")
+    return user
 
 
 def create_user(db: Session, user: schemas.UserCreate):
+    existing_user = get_user_by_email(db, user.email)
+    if existing_user:
+        raise HTTPException(status_code=400, detail="Email already registered")
     created_date = datetime.now()
     password = user.password
     db_user = models.User(email=user.email, password=password, username=user.username, created_at=created_date)
@@ -36,13 +45,17 @@ def authenticate_user(db: Session, login: str, password: str):
 
 
 def get_chats(db: Session, skip: int = 0, limit: int = 10):
-    return db.query(models.Chat).offset(skip).limit(limit).all()
+    chats = db.query(models.Chat).offset(skip).limit(limit).all()
+    if not chats:
+        raise HTTPException(status_code=404, detail="No chats found")
+    return chats
 
 
 def get_user_chats(db: Session, user_id: int):
-    return db.query(models.Chat).join(models.chat_user_association).filter(
+    chats = db.query(models.Chat).join(models.chat_user_association).filter(
         models.chat_user_association.c.user_id == user_id
     ).all()
+    return chats
 
 
 def create_chat(db: Session, chat: schemas.ChatCreate):
@@ -73,11 +86,12 @@ def create_chat(db: Session, chat: schemas.ChatCreate):
 
 def create_message(db: Session, message: schemas.MessageCreate, chat_id: int, sender_id: int):
     chat = db.query(models.Chat).filter(models.Chat.id == chat_id).first()
-    if chat:
-        chat.updated_at = datetime.now()
-        chat.updated_by_id = sender_id
-        db.commit()
-        db.refresh(chat)
+    if not chat:
+        raise HTTPException(status_code=404, detail="Chat not found")
+    chat.updated_at = datetime.now()
+    chat.updated_by_id = sender_id
+    db.commit()
+    db.refresh(chat)
     db_message = models.Message(
         **message.dict(),
         chat_id=chat_id,
@@ -92,6 +106,8 @@ def create_message(db: Session, message: schemas.MessageCreate, chat_id: int, se
 
 
 def create_private_chat(db: Session, current_user: int, to_user_id: int):
+    if current_user == to_user_id:
+        raise HTTPException(status_code=400, detail="Cannot create a private chat with oneself")
     new_chat = models.Chat(
         title=f"Private chat between {current_user} and {to_user_id}",
         created_at=datetime.now(),
@@ -136,6 +152,8 @@ def get_users_in_chat(db: Session, chat_id: int):
     users_in_chat = db.query(models.chat_user_association.c.user_id).filter(
         models.chat_user_association.c.chat_id == chat_id
     ).all()
+    if not users_in_chat:
+        raise HTTPException(status_code=404, detail="No users found in chat")
     return [user.user_id for user in users_in_chat]
 
 
@@ -146,6 +164,8 @@ def get_messages_in_chat(db: Session, chat_id: int):
         .filter(models.Message.chat_id == chat_id)
         .all()
     )
+    if not messages:
+        raise HTTPException(status_code=404, detail="No messages found in chat")
     result = []
     for message, username in messages:
         result.append({
@@ -163,26 +183,29 @@ def get_messages_in_chat(db: Session, chat_id: int):
 
 def set_user_online(db: Session, user_id: int):
     user = db.query(models.User).filter(models.User.id == user_id).first()
-    if user:
-        user.is_online = True
-        db.commit()
-        db.refresh(user)
-        return user
-    return None
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    user.is_online = True
+    db.commit()
+    db.refresh(user)
+    return user
 
 
 def set_user_offline(db: Session, user_id: int):
     user = db.query(models.User).filter(models.User.id == user_id).first()
-    if user:
-        user.is_online = False
-        db.commit()
-        db.refresh(user)
-        return user
-    return None
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    user.is_online = False
+    db.commit()
+    db.refresh(user)
+    return user
 
 
 def from_id_to_username(db: Session, user_id: int):
-    return db.query(models.User).filter(models.User.id == user_id).first().username
+    user = db.query(models.User).filter(models.User.id == user_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    return user.username
 
 
 def create_chat_permissions(db: Session, chat_permission: schemas.ChatPermissionsBase):
@@ -191,7 +214,7 @@ def create_chat_permissions(db: Session, chat_permission: schemas.ChatPermission
         models.ChatPermissions.user_id == chat_permission.user_id
     ).first()
     if permissions_in_chat:
-        raise HTTPException(status_code=400, detail="permissions_in_chat already exist")
+        raise HTTPException(status_code=400, detail="Permissions already exist for user in this chat")
     db_chat_permission = models.ChatPermissions(**chat_permission.dict())
     db.add(db_chat_permission)
     db.commit()
@@ -213,10 +236,13 @@ def change_chat_permissions(db: Session, chat_permission: schemas.ChatPermission
 
 
 def get_chat_permissions(db: Session, chat_id: int, user_id: int):
-    return db.query(models.ChatPermissions).filter(
+    permissions = db.query(models.ChatPermissions).filter(
         models.ChatPermissions.chat_id == chat_id,
         models.ChatPermissions.user_id == user_id
     ).first()
+    if not permissions:
+        raise HTTPException(status_code=404, detail="No permissions found for user in this chat")
+    return permissions
 
 
 def delete_chat(db: Session, chat_id: int, user_id: int):
@@ -235,11 +261,11 @@ def delete_chat(db: Session, chat_id: int, user_id: int):
 
 def edit_message(db: Session, message_edit: schemas.MessageEdit):
     to_edit_message = db.query(models.Message).filter(models.Message.id == message_edit.id).first()
-    if to_edit_message:
-        to_edit_message.content = message_edit.content
-        to_edit_message.is_edited = True
-        to_edit_message.updated_at = datetime.now()
-        db.commit()
-        db.refresh(to_edit_message)
-        return to_edit_message
-    return None
+    if not to_edit_message:
+        raise HTTPException(status_code=404, detail="Message not found")
+    to_edit_message.content = message_edit.content
+    to_edit_message.is_edited = True
+    to_edit_message.updated_at = datetime.now()
+    db.commit()
+    db.refresh(to_edit_message)
+    return to_edit_message
