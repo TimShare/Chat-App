@@ -1,14 +1,13 @@
-import { useState } from "react";
+import { useState, memo } from "react";
 import axios from "axios";
 import "./Modal.css";
 
-const Modal = ({ setIsModalOpen, userdata, onChatCreated }) => {
-  const [activeTab, setActiveTab] = useState("private"); // Для переключения вкладок
+const Modal = memo(({ setIsModalOpen, userdata, onChatCreated }) => {
   const [chatName, setChatName] = useState("");
   const [chatDescription, setChatDescription] = useState("");
 
   const handleCreateChat = () => {
-    if (activeTab === "group" && chatName && chatDescription) {
+    if (chatName && chatDescription) {
       // Создание группы
       axios
         .post("http://localhost:8000/chats", {
@@ -21,28 +20,12 @@ const Modal = ({ setIsModalOpen, userdata, onChatCreated }) => {
           setIsModalOpen(false);
           setChatName("");
           setChatDescription("");
-          onChatCreated();
+          if (onChatCreated) {
+            onChatCreated(); // Обновляем список чатов
+          }
         })
         .catch((error) => {
           console.error("Ошибка создания группы", error);
-        });
-    } else if (activeTab === "private" && chatName) {
-      // Создание личного сообщения
-      axios
-        .post("http://localhost:8000/chats/private-chat", null, {
-          params: {
-            to_user_id: chatName, // Идентификатор пользователя, с которым создаем чат
-            current_user: userdata.id, // ID текущего пользователя
-          },
-        })
-        .then((response) => {
-          console.log("Private chat created:", response.data);
-          setIsModalOpen(false);
-          setChatName(""); // Очищаем поля
-          onChatCreated(); // Обновляем список чатов
-        })
-        .catch((error) => {
-          console.error("Ошибка создания личного чата", error);
         });
     }
   };
@@ -50,58 +33,25 @@ const Modal = ({ setIsModalOpen, userdata, onChatCreated }) => {
   return (
     <div className="modal">
       <div className="modal-content">
-        <h2>Создать новый чат</h2>
-        {/* Вкладки */}
-        <div className="tab-container">
-          <button
-            className={activeTab === "private" ? "active" : ""}
-            onClick={() => setActiveTab("private")}
-          >
-            Личное сообщение
-          </button>
-          <button
-            className={activeTab === "group" ? "active" : ""}
-            onClick={() => setActiveTab("group")}
-          >
-            Группа
-          </button>
-        </div>
+        <h2>Создать новую группу</h2>
 
-        {/* Контент для вкладок */}
-        {activeTab === "private" && (
-          <>
-            <label>Имя пользователя</label>
-            <input
-              type="text"
-              value={chatName}
-              onChange={(e) => setChatName(e.target.value)}
-              placeholder="Введите имя пользователя"
-            />
-          </>
-        )}
+        <label>Название группы</label>
+        <input
+          type="text"
+          value={chatName}
+          onChange={(e) => setChatName(e.target.value)}
+          placeholder="Введите название группы"
+        />
 
-        {activeTab === "group" && (
-          <>
-            <label>Название группы</label>
-            <input
-              type="text"
-              value={chatName}
-              onChange={(e) => setChatName(e.target.value)}
-              placeholder="Введите название группы"
-            />
-            <label>Описание группы</label>
-            <textarea
-              value={chatDescription}
-              onChange={(e) => setChatDescription(e.target.value)}
-              placeholder="Введите описание группы"
-            />
-          </>
-        )}
+        <label>Описание группы</label>
+        <textarea
+          value={chatDescription}
+          onChange={(e) => setChatDescription(e.target.value)}
+          placeholder="Введите описание группы"
+        />
 
         <div className="modal-actions">
-          <button onClick={handleCreateChat}>
-            {activeTab === "group" ? "Создать группу" : "Отправить сообщение"}
-          </button>
+          <button onClick={handleCreateChat}>Создать группу</button>
           <button
             onClick={() => {
               setIsModalOpen(false);
@@ -113,6 +63,6 @@ const Modal = ({ setIsModalOpen, userdata, onChatCreated }) => {
       </div>
     </div>
   );
-};
+});
 
 export default Modal;

@@ -1,30 +1,64 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { sendMessage } from "../../helpers/websocketService";
 import "./MessageInput.css";
-const MessageInput = ({ chat, userdata, accessLevels }) => {
+import axios from "axios";
+const MessageInput = ({
+  chat,
+  userdata,
+  accessLevels,
+  editMessage,
+  onEditComplete,
+  onMessageUpdate,
+}) => {
   const [message, setMessage] = useState("");
+  const [isEditing, setIsEditing] = useState(false);
 
   // Проверка прав доступа на отправку сообщений
   const canSendMessage = accessLevels[userdata.username] === "read_and_write";
 
-  // Функция для отправки сообщения через WebSocket
-  const handleSendMessage = () => {
+  useEffect(() => {
+    // Проверяем, является ли пользователь отправителем сообщения
+    if (editMessage && editMessage.sender_id === userdata.id) {
+      setMessage(editMessage.content);
+      setIsEditing(true);
+    } else if (editMessage) {
+      // Если пользователь не является отправителем, сбрасываем режим редактирования
+      alert("Вы можете редактировать только свои сообщения.");
+      onEditComplete();
+    }
+  }, [editMessage, userdata.id, onEditComplete]);
+
+  const handleSendMessage = async () => {
+    // console.log("Текущий editMessage в handleSendMessage:", editMessage);
     if (message.trim() !== "" && chat && chat.id && canSendMessage) {
       const messageData = {
-        chat_id: chat.id, // ID выбранного чата
-        content: message, // Текст сообщения
-        sender_id: userdata.id, // ID отправителя
+        chat_id: chat.id,
+        content: message,
+        sender_id: userdata.id,
+        action_type: "send_message",
       };
 
-      // Отправляем сообщение через сервис WebSocket
-      sendMessage(messageData);
+      if (isEditing) {
+        // sendMessage({ ...editMessage, content: message });
+        onEditComplete(); // Завершаем редактирование
+        setIsEditing(false); // Выходим из режима редактирования
+        sendMessage({
+          id: editMessage.id,
+          chat_id: chat.id,
+          content: message,
+          action_type: "message_edited",
+        });
+      } else {
+        // Отправка нового сообщения
+        sendMessage(messageData);
+      }
 
       // Очищаем поле после отправки
       setMessage("");
     }
   };
 
-  // Функция для обработки нажатия клавиши Enter
+  // Обработка нажатия клавиши Enter
   const handleKeyPress = (e) => {
     if (e.key === "Enter") {
       handleSendMessage();
@@ -38,12 +72,25 @@ const MessageInput = ({ chat, userdata, accessLevels }) => {
         placeholder="Сообщение..."
         value={message}
         onChange={(e) => setMessage(e.target.value)}
-        onKeyDown={handleKeyPress} // Отправляем сообщение при нажатии Enter
-        disabled={!canSendMessage} // Отключаем поле ввода, если нет прав
+        onKeyDown={handleKeyPress}
+        disabled={!canSendMessage}
       />
+
+      {isEditing && (
+        <button
+          onClick={() => {
+            setIsEditing(false);
+            setMessage("");
+            onEditComplete();
+          }}
+          className="cancel-edit"
+        >
+          Отмена
+        </button>
+      )}
       <button
         onClick={handleSendMessage}
-        disabled={!canSendMessage || message.trim() === ""} // Отключаем кнопку, если нет прав или поле пустое
+        disabled={!canSendMessage || message.trim() === ""}
       >
         ➤
       </button>

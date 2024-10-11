@@ -1,7 +1,9 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
+import { ChatContext } from "../../helpers/chatContext";
 import axios from "axios";
 import Chat_list from "../chat_list/Chat_List";
 import Modal from "../modal/Modal";
+import fetchUserChats from "../../helpers/fetchUserChats";
 import "./Sidebar.css";
 import {
   addMessageHandler,
@@ -10,26 +12,18 @@ import {
 
 const Sidebar = ({ userdata, setSelectedChat }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [userChats, setUserChats] = useState([]);
+  const { userChats, setUserChats } = useContext(ChatContext);
   const user_id = userdata.id;
-
-  const fetchUserChats = async () => {
-    try {
-      const response = await axios.get(
-        `http://localhost:8000/users/${user_id}/chats`
-      );
-      setUserChats(response.data);
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
   useEffect(() => {
     if (user_id) {
-      fetchUserChats();
-
+      fetchUserChats(setUserChats, user_id);
       const handleNewMessage = (message) => {
-        fetchUserChats();
+        // Проверяем, если действие 'chat_deleted'
+        if (message.action_type === "chat_deleted") {
+          fetchUserChats(setUserChats, user_id);
+        } else {
+          fetchUserChats(setUserChats, user_id);
+        }
       };
 
       addMessageHandler(handleNewMessage); // Добавляем обработчик сообщений
@@ -49,6 +43,12 @@ const Sidebar = ({ userdata, setSelectedChat }) => {
     <aside className="sidebar">
       <div className="profile">
         <span>{userdata.username}</span>
+        <button
+          className="new-chat"
+          onClick={() => fetchUserChats(setUserChats, user_id)}
+        >
+          Обновить
+        </button>
         <button className="new-chat" onClick={() => setIsModalOpen(true)}>
           Новый чат
         </button>
@@ -61,7 +61,7 @@ const Sidebar = ({ userdata, setSelectedChat }) => {
         <Modal
           userdata={userdata}
           setIsModalOpen={setIsModalOpen}
-          onChatCreated={fetchUserChats}
+          onChatCreated={() => fetchUserChats(setUserChats, user_id)}
         />
       )}
     </aside>

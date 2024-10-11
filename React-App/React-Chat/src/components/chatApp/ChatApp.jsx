@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
 import Sidebar from "../sidebar/Sidebar";
 import ChatWindow from "../chatWindow/ChatWindow";
+import { ChatProvider } from "../../helpers/chatContext";
 import {
   connectWebSocket,
   disconnectWebSocket,
-  getWebSocketState,
+  addMessageHandler,
+  removeMessageHandler,
 } from "../../helpers/websocketService";
 import "./ChatApp.css";
 
@@ -24,19 +26,37 @@ const ChatApp = ({ userdata, setUserdata }) => {
       };
     }
   }, [userdata]);
-
+  useEffect(() => {
+    if (userdata.id) {
+      const handleNewMessage = (message) => {
+        if (
+          message.action_type === "chat_deleted" &&
+          selectedChat.id == message.chat_id
+        ) {
+          setSelectedChat(null);
+        }
+      };
+      addMessageHandler(handleNewMessage); // Добавляем обработчик сообщений
+      return () => {
+        removeMessageHandler(handleNewMessage); // Очищаем обработчик при размонтировании
+      };
+    }
+  }, [selectedChat]);
   return (
     <div className="chat-container">
-      <Sidebar
-        userdata={userdata}
-        setUserdata={setUserdata}
-        setSelectedChat={setSelectedChat}
-      />
-      <ChatWindow
-        chat={selectedChat}
-        userdata={userdata}
-        setSelectedChat={setSelectedChat}
-      />
+      <ChatProvider>
+        <Sidebar
+          userdata={userdata}
+          setUserdata={setUserdata}
+          setSelectedChat={setSelectedChat}
+          chat={selectedChat}
+        />
+        <ChatWindow
+          chat={selectedChat}
+          userdata={userdata}
+          setSelectedChat={setSelectedChat}
+        />
+      </ChatProvider>
     </div>
   );
 };

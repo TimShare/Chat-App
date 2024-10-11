@@ -20,6 +20,7 @@ const AddMemberModal = memo(({ isOpen, onClose, chat }) => {
         chat_id: chat.id,
         content: `пригласил ${username}`, // Используем имя пользователя
         sender_id: chat.owner_id,
+        action_type: "send_message",
       };
 
       // Отправляем сообщение через сервис WebSocket

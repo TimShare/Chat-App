@@ -3,8 +3,11 @@
   line-height: 1.5;
   font-weight: 400;
 
-  /* color: #213547;
-  background-color: #fff; */
+  /* Основные цвета для темной темы */
+  --background-color: #202734;
+  --text-color: #FFFFFF;
+  --heading-color: #4A90E2;
+  --accent-color: #3B455A;
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -12,16 +15,12 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
-
-
 body {
   margin: 0;
   display: flex;
-  place-items: center;
+  justify-content: center;
+  align-items: center;
   min-height: 100vh;
-}
-
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
+  background-color: var(--background-color); /* Фон для всего приложения */
+  color: var(--text-color); /* Основной цвет текста */
 }

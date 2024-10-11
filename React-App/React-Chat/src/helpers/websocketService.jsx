@@ -30,7 +30,6 @@ export const connectWebSocket = (userId, onOpen, onClose, onError) => {
 
     websocket.onmessage = (event) => {
       const data = JSON.parse(event.data);
-      console.log(data);
       messageHandlers.forEach((handler) => handler(data));
     };
   }
